@@ -1,0 +1,35 @@
+<?php $this->widget($this->getModule()->getClass('gridview'), array(
+    'id'=>'plan_gridview',
+    'dataProvider'=> $dataProvider,
+    'columns'=>array(
+        array(
+            'name'=>'id',
+            'htmlOptions'=>array('style'=>'text-align:center;'),
+            'type'=>'html',
+        ),
+        array(
+            'name'=>'name',
+            'htmlOptions'=>array('style'=>'text-align:center;'),
+            'type'=>'html',
+        ),
+        array(
+           'name'=>'type',
+           'value'=>'$data->typeDesc',
+           'htmlOptions'=>array('style'=>'text-align:center;'),
+           'type'=>'html',
+        ),    
+        array(
+           'name'=>'price',
+           'value'=>'$data->priceDesc',
+           'htmlOptions'=>array('style'=>'text-align:center;'),
+           'type'=>'html',
+        ),
+        array(
+            'name'=>'status',
+            'value'=>'Helper::htmlColorText($data->getStatusText())',
+            'htmlOptions'=>array('style'=>'text-align:center;width:10%'),
+            'type'=>'html',
+            'filter'=>false,
+        ),      
+    ),
+)); 

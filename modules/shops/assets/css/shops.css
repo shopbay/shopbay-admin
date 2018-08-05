@@ -1,0 +1,63 @@
+/* BEGIN overriding bootstrap css - temporary required until entired UI framework is incorporating bootstrap.  */
+/*       by then, all will be moved to common.css */
+.page-sidebar * {
+    -webkit-box-sizing: content-box; /*override bootstrap.css */
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+.bootstrap-page * {
+    -webkit-box-sizing: content-box; /*override bootstrap.css */
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+.bootstrap-page h1 {
+    font-size: 2em;
+    color: black;
+    font-weight: bold;
+}
+.bootstrap-page h2 {
+    font-size: 1.5em;
+    color: black;
+    font-weight: bold;
+}
+.bootstrap-page h3 {
+    font-size: 1.2em;
+}
+.bootstrap-page h4 {
+    font-size: 1.1em;
+}
+.bootstrap-page .pagemenu .menuitem .label {
+    color: #DCDCDC;
+    padding: 0px;
+    display: inherit;
+}
+.bootstrap-page .pagemenu li a:hover .label i,
+.bootstrap-page .pagemenu li a.active .label i {
+    color: black;
+}
+.bootstrap-page .image-form,
+.bootstrap-page .data-form {
+    display: inline-block;
+}
+.bootstrap-page .upload-form div.progress {
+    margin:0;
+}
+.bootstrap-page .upload-form .row.fileupload-buttonbar {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+.bootstrap-page .upload-form .template-download.fade {
+    opacity: 1;
+}
+/* END overriding bootstrap css */
+
+
+/*Responsive Styles*/
+@media screen and (max-width : 640px){
+    
+    .main-view .body .data-column.image,
+    .main-view .body .data-column.normal {
+        width: 100%;
+    }
+
+}

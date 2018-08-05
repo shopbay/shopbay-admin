@@ -1,0 +1,90 @@
+.page-container {
+    margin-top: 60px;
+    background: white;
+}
+.page-container,
+body .page-content {
+    min-height: auto;
+}
+body .footer-container {
+    margin-top: 30px;
+}
+
+#nav-container {
+    height: 0;
+}
+#nav-container div
+{
+    padding: 0;
+    display: inline-block;
+    width: 100%;
+    margin-top: 0px;
+    border-top: 0px;
+    border-bottom: 0px;
+    height: 30px;    
+}
+#nav-container .alert{
+    font-size: 1.2em;
+    background: pink;
+    color: red;
+    padding: 0px 10px;
+    margin-left: -15px;
+}
+
+.form-wrapper
+{
+    margin: 20px auto;
+    width: 515px;
+    border:1px solid #EDEDED;
+}
+.form-wrapper form
+{
+    padding-bottom: 40px;
+}
+
+.page-container #rights .flashes {
+    right: 0;
+    left: 0;
+    width: 100%;
+    position: relative;
+}
+#rights.container {
+    padding: 20px 30px;    
+}
+#rights.container .span-11 {
+    display: inline-block;
+    width:45%;
+    vertical-align: top;
+}
+#rights.container .span-12 {
+    display: inline-block;
+    width:50%;
+    vertical-align: top;
+}
+#rights.container .form .row.buttons input {
+    background: lightskyblue;
+    width: 100px;
+    margin: 20px 0px;
+    font-size: 1.1em;
+    padding:5px 10px;
+}
+#rights.container .errorMessage {
+    color: red;
+}
+
+#rights .breadcrumbs{
+    padding: 0px 0px 20px;
+}
+
+#rights .permission-table {
+    width: 100%;
+    overflow-x: scroll;
+}
+
+body.admin #shop_list {
+    min-height: 100px;
+}
+
+div.form .page-label label {
+    display: inline;
+}
