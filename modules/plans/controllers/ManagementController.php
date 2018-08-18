@@ -233,22 +233,20 @@ class ManagementController extends SPageIndexController
             ]);//data is coming from api
         }
         
-        if ($this->action->id!='subscribe'){
-            //section 2: Process History
+        //section 2: Process History
+        $sections->add([
+                'id'=>'history','name'=>Sii::t('sii','Process History'),'heading'=>true,
+                'viewFile'=>$this->module->getView('history'),
+                'viewData'=>['dataProvider'=>$model->searchTransition($model->id)]
+            ]);
+
+        if ($model->isInternal){//show subscriber for internal plan only
+            //section 3: Show subscribers list
             $sections->add([
-                    'id'=>'history','name'=>Sii::t('sii','Process History'),'heading'=>true,
-                    'viewFile'=>$this->module->getView('history'),
-                    'viewData'=>['dataProvider'=>$model->searchTransition($model->id)]
+                    'id'=>'history','name'=>Sii::t('sii','Subscribers'),'heading'=>true,
+                    'viewFile'=>$this->module->getView('plans.subscriberview'),
+                    'viewData'=>['dataProvider'=>$model->searchSubscribers()]
                 ]);
-            if ($model->isInternal){//show subscriber for internal plan only
-                //section 3: Show subscribers list
-                $sections->add([
-                        'id'=>'history','name'=>Sii::t('sii','Subscribers'),'heading'=>true,
-                        'viewFile'=>$this->module->getView('plans.subscriberview'),
-                        'viewData'=>['dataProvider'=>$model->searchSubscribers()]
-                    ]);
-            }
-            
         }
         
         return $sections->toArray();
