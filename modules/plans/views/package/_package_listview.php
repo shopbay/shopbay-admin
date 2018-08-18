@@ -19,17 +19,25 @@
                 [
                     'type'=>'raw',
                     'template'=>'<div class="element">{value}</div>',
+                    'value'=>'<strong>'.Sii::t('sii','Type').'</strong> '.CHtml::encode($data->getTypeDesc()),
+                ],
+                [
+                    'type'=>'raw',
+                    'template'=>'<div class="element">{value}</div>',
                     'value'=>'<strong>'.Sii::t('sii','Business Ready').'<strong> '.CHtml::encode($data->businessReady),
+                    'visible'=>!$data->isInternal,
                 ],
                 [
                     'type'=>'raw',
                     'template'=>'<div class="element">{value}</div>',
                     'value'=>'<strong>'.Sii::t('sii','Show Pricing').'<strong> '.CHtml::encode($data->showPricing),
+                    'visible'=>!$data->isInternal,
                 ],
                 [
                     'type'=>'raw',
                     'template'=>'<div class="element">{value}</div>',
                     'value'=>'<strong>'.Sii::t('sii','Show Button').'<strong> '.CHtml::encode($data->showButton),
+                    'visible'=>!$data->isInternal,
                 ],
             ],
         ]); 

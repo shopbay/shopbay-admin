@@ -1,4 +1,3 @@
-<?php $this->getModule()->registerGridViewCssFile();?>
 <?php
 $this->breadcrumbs = [
     Sii::t('sii','Admin Users'),

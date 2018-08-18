@@ -1,4 +1,3 @@
-<?php $this->module->registerGridViewCssFile();?>
 <?php
 $this->breadcrumbs = [
     Sii::t('sii','Users'),

@@ -57,6 +57,7 @@ echo " 2.1 grant write to group ".$userGroup." for following sub directories: \n
 $subdirs = [
     'www/assets',
     'www/files',
+    'www/uploads',
     'runtime',
     'assets',
     'modules/*/assets',

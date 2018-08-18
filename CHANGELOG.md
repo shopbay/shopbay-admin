@@ -2,7 +2,7 @@
 
 ## Version 0.25 - Aug 5, 2018
 
-This release contains several enhancements, as well as also supports PHP 7.2 and also Yii 1.1.20 and Yii 2.0.15
+This release contains several enhancements, as well as also supports PHP 7.2 and Yii 1.1.20 and Yii 2.0.15
 
 ### Enhancements:
 

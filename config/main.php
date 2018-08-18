@@ -38,7 +38,7 @@ $webapp->addComponents([
             'ticket/view/*'=>'tickets/management/view',
             'plan/view/*'=>'plans/management/view',
             'package/view/*'=>'plans/package/view',
-            'media/assets/preview/*'=>'media/files',
+            'media/assets/preview/*'=>'media/preview',
             'media/assets/*'=>'media/management/assets',
             'media/view/*'=>'media/management/view',
             'media/download/*'=>'media/management/download',

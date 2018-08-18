@@ -57,6 +57,9 @@
         </div>        
 
 	<div class="row" style="clear:both;padding-top: 15px;">
+            <h4>
+                <?php echo Sii::t('sii','Below additional parameters are for non-internal types use:'); ?>
+            </h4>
             <?php echo $form->labelEx($model,'params',array('style'=>'margin-bottom: 5px;')); ?>
             <?php foreach (Package::getParams() as $key => $value) {
                     echo CHtml::tag('span',['style'=>'width: 180px;display: inline-block;'],$value['name']);

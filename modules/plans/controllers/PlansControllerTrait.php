@@ -45,20 +45,26 @@ trait PlansControllerTrait
      */
     public function getPageMenu($model)
     {
-        return array(
-            array('id'=>'view','title'=>Sii::t('sii','View {object}',array('{object}'=>$model->displayName())),'subscript'=>Sii::t('sii','view'),  'url'=>$model->viewUrl,'linkOptions'=>array('class'=>$this->action->id=='view'?'active':'')),
-            array('id'=>'create','title'=>Sii::t('sii','Create {object}',array('{object}'=>$model->displayName())),'subscript'=>Sii::t('sii','create'), 'url'=>array('create')),
-            array('id'=>'update','title'=>Sii::t('sii','Update {object}',array('{object}'=>$model->displayName())),'subscript'=>Sii::t('sii','update'), 'url'=>array('update', 'id'=>$model->id),'visible'=>$model->updatable(user()->getId(),true),'linkOptions'=>array('class'=>$this->action->id=='update'?'active':'')),
-            array('id'=>'delete','title'=>Sii::t('sii','Delete {object}',array('{object}'=>$model->displayName())),'subscript'=>Sii::t('sii','delete'), 'visible'=>$model->deletable(user()->getId(),true), 
-                    'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),
-                                         'onclick'=>'$(\'.page-loader\').show();',
-                                         'confirm'=>Sii::t('sii','Are you sure you want to delete this {object}?',array('{object}'=>strtolower($model->displayName()))))),
-            array('id'=>'submit','title'=>Sii::t('sii','Submit {object}',array('{object}'=>$model->displayName())),'subscript'=>Sii::t('sii','submit'), 'visible'=>$model->submitable(user()->getId(),true), 
-                  'linkOptions'=>array('submit'=>url($this->submitUrl,array(get_class($model).'[id]'=>$model->id)),
-                                     'onclick'=>'$(\'.page-loader\').show();',
-                                     'confirm'=>Sii::t('sii','Are you sure you want to submit this {object}?',array('{object}'=>strtolower($model->displayName()))),
-            )),
-        );
+        return [
+            ['id'=>'view','title'=>Sii::t('sii','View {object}',['{object}'=>$model->displayName()]),'subscript'=>Sii::t('sii','view'),  'url'=>$model->viewUrl,'linkOptions'=>['class'=>$this->action->id=='view'?'active':'']],
+            ['id'=>'create','title'=>Sii::t('sii','Create {object}',['{object}'=>$model->displayName()]),'subscript'=>Sii::t('sii','create'), 'url'=>['create']],
+            ['id'=>'update','title'=>Sii::t('sii','Update {object}',['{object}'=>$model->displayName()]),'subscript'=>Sii::t('sii','update'), 'url'=>['update', 'id'=>$model->id],'visible'=>$model->updatable(user()->getId(),true),'linkOptions'=>['class'=>$this->action->id=='update'?'active':'']],
+            ['id'=>'delete','title'=>Sii::t('sii','Delete {object}',['{object}'=>$model->displayName()]),'subscript'=>Sii::t('sii','delete'), 'visible'=>$model->deletable(user()->getId(),true), 
+                    'linkOptions'=>[
+                        'submit'=>['delete','id'=>$model->id],
+                        'onclick'=>'$(\'.page-loader\').show();',
+                        'confirm'=>Sii::t('sii','Are you sure you want to delete this {object}?',['{object}'=>strtolower($model->displayName())]),
+                    ]
+            ],
+            ['id'=>'submit','title'=>Sii::t('sii','Submit {object}',['{object}'=>$model->displayName()]),'subscript'=>Sii::t('sii','submit'), 'visible'=>$model->submitable(user()->getId(),true), 
+                    'linkOptions'=>[
+                        'submit'=>url($this->submitUrl,[get_class($model).'[id]'=>$model->id]),
+                        'onclick'=>'$(\'.page-loader\').show();',
+                        'confirm'=>Sii::t('sii','Are you sure you want to submit this {object}?',['{object}'=>strtolower($model->displayName())]),
+                    ],
+            ],
+            ['id'=>'subscribe','title'=>Sii::t('sii','Subscribe {object}',['{object}'=>$model->displayName()]),'subscript'=>Sii::t('sii','subscribe'), 'url'=>['subscribe', 'plan'=>$model->id],'visible'=>$model->isInternal,'linkOptions'=>['class'=>$this->action->id=='subscribe'?'active':'']],
+        ];
     } 
     /**
      * OVERRIDE METHOD

@@ -61,6 +61,8 @@ class UsersModule extends SModule
         //load layout and common css/js files
         $this->registerScripts();
         $this->registerCssFile('application.assets.css','application.css');
+        $this->registerFormCssFile();
+        $this->registerGridViewCssFile();
     }
     /**
     * @return ServiceManager

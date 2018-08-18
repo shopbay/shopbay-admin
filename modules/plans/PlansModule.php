@@ -48,6 +48,7 @@ class PlansModule extends SModule
                 'planitemview'=>'application.modules.plans.views.management._planitem_gridview',
                 'planworkflowview'=>'application.modules.plans.views.package._plan_gridview_workflow',
                 'plangridview'=>'application.modules.plans.views.package._plan_gridview',
+                'subscriberview'=>'application.modules.plans.views.management._subscriber_gridview',
                 //tasks views
                 'history'=>'tasks.processhistory',
                 //account views

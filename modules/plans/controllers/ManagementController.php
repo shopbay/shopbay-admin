@@ -5,6 +5,8 @@
  * file that was distributed with this source code.
  */
 Yii::import('common.components.actions.api.ApiDataProvider');
+Yii::import('common.modules.plans.actions.ApiSubscribeAction');
+Yii::import('common.modules.plans.actions.ApiUnsubscribeAction');
 Yii::import('plans.controllers.PlansControllerTrait');
 /**
  * Description of ManagementController
@@ -42,48 +44,149 @@ class ManagementController extends SPageIndexController
      */
     public function actions()
     {
-        return array_merge(parent::actions(),array(
-            'prepareIndex'=>array(
+        return array_merge(parent::actions(),[
+            'prepareIndex'=>[
                 'class'=>'common.components.actions.api.ApiIndexAction',
                 'apiRoute'=>$this->apiRoute,
                 'model'=>$this->modelType,
                 'afterIndex'=>'prepareDataProvider',
-            ),            
-            'view'=>array(
+            ],            
+            'view'=>[
                 'class'=>'common.components.actions.api.ApiReadAction',
                 'apiRoute'=>$this->apiRoute,
                 'model'=>$this->modelType,
                 'childAttributes'=>['items'],
-            ),                    
-            'create'=>array(
+            ],                    
+            'create'=>[
                 'class'=>'common.components.actions.api.ApiCreateAction',
                 'apiRoute'=>$this->apiRoute,
                 'model'=>$this->modelType,
                 'setAttributesMethod'=>'setModelAttributes',
-            ),
-            'update'=>array(
+            ],
+            'update'=>[
                 'class'=>'common.components.actions.api.ApiUpdateAction',
                 'apiRoute'=>$this->apiRoute,
                 'model'=>$this->modelType,
                 'childAttributes'=>['items'],
                 'beforeRender'=>'prepareItemsData',
                 'setAttributesMethod'=>'setModelAttributes',
-            ), 
-            'delete'=>array(
+            ], 
+            'delete'=>[
                 'class'=>'common.components.actions.api.ApiDeleteAction',
                 'apiRoute'=>$this->apiRoute,
                 'model'=>$this->modelType,
-            ),
-            'submit'=>array(
+            ],
+            'submit'=>[
                 'class'=>'common.components.actions.api.ApiTransitionAction',
                 'apiRoute'=>$this->apiRoute,
                 'model'=>$this->modelType,
                 'transitionAction'=>'submit',
                 'flashTitle'=>Sii::t('sii','Plan Submission'),
                 'flashMessage'=>Sii::t('sii','"{name}" is submitted successfully.'),
-            ),
-        ));
-    } 
+            ],
+        ]);
+    }
+    /**
+     * Subscribe a plan
+     */
+    public function actionSubscribe($plan)
+    {
+        $model = $this->loadModel($plan);
+        
+        if (isset($_POST['subscriber']) && $_POST['subscriber']!=Account::GUEST){
+            try {
+                
+                $action = new ApiSubscribeAction($this,__METHOD__,$model->id,$_POST['subscriber']);
+                $action->postFields = json_encode([
+                    'shop'=>null,
+                    'package'=>$model->packageModel->id,
+                    'paymentNonce'=> rand(0, 1000),//pass in dummy paymentNonce since this is mandatory field
+                ]);
+                $action->afterSubscribe = 'subscribeOK';
+                $this->runAction($action);  
+                unset($_POST);//unset $_POST first to avoid multiple subscriptions if too many POST sent from browser
+                Yii::app()->end();
+                
+            } catch (CException $ex) {
+                $this->unsubscribeError($ex->getMessage(), $ex->getTraceAsString());
+            }
+            
+        }
+        
+        if ($model->isInternal)
+            $this->render('subscribe',['model'=>$model]);
+        else
+            throwError403(Sii::t('sii','Unauthorized Action'));
+    }      
+    /**
+     * Gather the successful subscription returned from API 
+     */
+    public function subscribeOK($subscription)
+    {
+        user()->setFlash($this->modelType,[
+            'message'=>null,
+            'type'=>'success',
+            'title'=>Sii::t('sii','User "{subscriber}" is subscribed to Package "{package}" and Plan "{plan}" successfully.',[
+                            '{subscriber}'=>$subscription['account_id'],
+                            '{plan}'=>$subscription['plan']['id'],
+                            '{package}'=>$subscription['package'],
+                        ]),
+        ]);
+        $this->redirect(url('plans/management/view/'.$subscription['plan']['id']));
+    }    
+    /**
+     * Unsubcribe a plan
+     */
+    public function actionUnsubscribe($id,$subNo,$planId)
+    {
+        $subscription = $this->loadModel($id,'Subscription');
+         
+        if ($subscription!=null && $subscription->subscription_no == $subNo && $subscription->plan_id == $planId){
+
+            try {
+                //Note: $subscription->shop = null;//for admin user subscription, there is no need to have shop
+                $action = new ApiUnsubscribeAction($this,__METHOD__,$subscription->subscription_no,$subscription->shop,$subscription->package_id,$subscription->plan_id,$subscription->account_id);
+                $action->afterUnsubscribe = 'unsubscribeOK';
+                $this->runAction($action);  
+                Yii::app()->end();
+                
+            } catch (CException $ex) {
+                $this->unsubscribeError($ex->getMessage(), $ex->getTraceAsString());
+            }
+        }
+        else
+            $this->unsubscribeError(__METHOD__.' Subscription ID '.$id.' not found!');
+        
+    }     
+    /**
+     * Gather the successful unsubscription returned from API
+     * @param $params The callback return data; @see ApiUnsubscribeAction::getReturnModel() for data structure
+     */
+    public function unsubscribeOK($params)
+    {
+        user()->setFlash($this->modelType,[
+            'message'=>null,
+            'type'=>'success',
+            'title'=>Sii::t('sii','User "{subscriber}" is unsubscribed from Plan "{plan}" successfully.',[
+                            '{subscriber}'=>$params['subscriber'],
+                            '{plan}'=>$params['plan_id'],
+                        ]),
+        ]);
+        $this->redirect(url('plans/management/view/'.$params['plan_id']));
+    }    
+    /**
+     * Gather the unsuccessful unsubscription message
+     */
+    public function unsubscribeError($errorMessage,$errorStackTrace=null)
+    {
+        logError(__METHOD__.' Error '.$errorMessage,$errorStackTrace);
+        user()->setFlash($this->modelType,[
+            'message'=>$errorMessage,
+            'type'=>'error',
+            'title'=>Sii::t('sii','Plan Unsubscribe Error'),
+        ]);
+        $this->redirect(url('plans/management/index'));
+    }     
     /**
      * Set model attributes for create/update action
      * @param type $model
@@ -117,17 +220,37 @@ class ManagementController extends SPageIndexController
         $sections = new CList();
         //section 1: Plan Items
         if ($model->hasItems){
-            $dataProvider = new CArrayDataProvider($this->parseItems($model),array(
-                    'pagination'=>array(
-                        'pageSize'=>1000,//need to set to higher value to have all items in one page
-                        'currentPage'=>0,//page 1
-            )));
-            $sections->add(array('id'=>'planitem','name'=>Sii::t('sii','Plan Items'),'heading'=>true,
-                        'viewFile'=>$this->getModule()->getView('plans.planitemview'),'viewData'=>array('dataProvider'=>$dataProvider)));//data is coming from api
+            $dataProvider = new CArrayDataProvider($this->parseItems($model),[
+                                'pagination'=>[
+                                    'pageSize'=>1000,//need to set to higher value to have all items in one page
+                                    'currentPage'=>0,//page 1
+                                ]
+                            ]);
+            $sections->add([
+                'id'=>'planitem','name'=>Sii::t('sii','Plan Items'),'heading'=>true,
+                'viewFile'=>$this->module->getView('plans.planitemview'),
+                'viewData'=>['dataProvider'=>$dataProvider]
+            ]);//data is coming from api
         }
-        //section 2: Process History
-        $sections->add(array('id'=>'history','name'=>Sii::t('sii','Process History'),'heading'=>true,
-                             'viewFile'=>$this->getModule()->getView('history'),'viewData'=>array('dataProvider'=>$model->searchTransition($model->id))));
+        
+        if ($this->action->id!='subscribe'){
+            //section 2: Process History
+            $sections->add([
+                    'id'=>'history','name'=>Sii::t('sii','Process History'),'heading'=>true,
+                    'viewFile'=>$this->module->getView('history'),
+                    'viewData'=>['dataProvider'=>$model->searchTransition($model->id)]
+                ]);
+            if ($model->isInternal){//show subscriber for internal plan only
+                //section 3: Show subscribers list
+                $sections->add([
+                        'id'=>'history','name'=>Sii::t('sii','Subscribers'),'heading'=>true,
+                        'viewFile'=>$this->module->getView('plans.subscriberview'),
+                        'viewData'=>['dataProvider'=>$model->searchSubscribers()]
+                    ]);
+            }
+            
+        }
+        
         return $sections->toArray();
     }
     /**
@@ -170,5 +293,26 @@ class ManagementController extends SPageIndexController
         $model->items = $names;
         logTrace(__METHOD__.' model items',$model->items);
         return $model;
+    }
+    /**
+     * Get admin users (exludes those already subcribed to the plan)
+     * @param CModel $planModel Plan model
+     */
+    public function getAdminUsersArray($planModel)
+    {
+        $candidates = [
+            Account::GUEST => Sii::t('sii','Select account to subscribe to this plan'),
+        ];
+        foreach (Account::model()->admin()->findAll() as $user) {
+            $candidates[$user->id] = $user->name.' ('.$user->id.')';
+        }
+            
+        $subcriptions = $planModel->searchSubscribers()->data;
+        foreach ($subcriptions as $subscription) {
+            if ($subscription->isActive && isset($candidates[$subscription->account_id]))
+                unset($candidates[$subscription->account_id]);//remove existing subscriber
+        }
+        
+        return $candidates;
     }
 }
